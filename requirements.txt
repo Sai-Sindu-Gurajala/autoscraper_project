@@ -1,0 +1,15 @@
+selenium
+webdriver-manager
+autoscraper
+pandas
+openpyxl
+cloudscraper
+beautifulsoup4
+matplotlib
+PyQt5
+pygetwindow
+undetected-chromedriver
+fake_useragent
+playwright
+pytesseract
+pillow
