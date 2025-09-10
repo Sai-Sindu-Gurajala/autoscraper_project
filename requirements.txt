@@ -13,3 +13,5 @@ fake_useragent
 playwright
 pytesseract
 pillow
+requests
+pyperclip

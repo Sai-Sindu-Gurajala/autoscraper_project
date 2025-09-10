@@ -1,0 +1,24 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+
+# Virtual envs
+env/
+.venv/
+
+# Builds / outputs
+build/
+dist/
+output/
+*.log
+
+# VS Code
+.vscode/
+
+# Installer artifacts (keep sources)
+installer/*.msi
+installer/*.wixpdb
+installer/cab*.cab
+
+# Binaries you don't want in git
+assets/chromedriver.exe

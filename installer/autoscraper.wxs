@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package
+    Name="Autoscraper"
+    Manufacturer="Sai Sindu"
+    Version="1.0.0"
+    UpgradeCode="{A51B0888-61BC-4D23-971D-7E8C63BA0D8E}"
+    Language="1033">
+
+    <!-- Put payload INSIDE the MSI so you only share one file -->
+    <MediaTemplate EmbedCab="yes"/>
+
+    <!-- Installer metadata -->
+    <SummaryInformation
+      Description="Autoscraper desktop application"
+      Keywords="web scraping;selenium;pyqt" />
+
+    <!-- Install to: C:\Program Files\Autoscraper -->
+    <StandardDirectory Id="ProgramFilesFolder">
+      <Directory Id="INSTALLFOLDER" Name="Autoscraper"/>
+    </StandardDirectory>
+
+    <!-- Explicitly declare these standard dirs to avoid directory-table oddities -->
+    <StandardDirectory Id="ProgramMenuFolder"/>
+    <StandardDirectory Id="DesktopFolder"/>
+
+    <!-- Optional ARP icon (only if assets\icon.ico exists) -->
+    <Icon Id="AppIcon" SourceFile="$(var.AssetsDir)\icon.ico"/>
+    <Property Id="ARPPRODUCTICON" Value="AppIcon"/>
+
+    <Feature Id="MainFeature" Title="Autoscraper" Level="1">
+      <!-- ONE file per component (avoids WIX0367/0368) -->
+      <Component Id="ExeComponent" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="MainExe" Source="$(var.DistDir)\Autoscraper.exe" KeyPath="yes"/>
+      </Component>
+
+      <!-- Ship chromedriver only if you really need it -->
+      <Component Id="ChromedriverComponent" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="ChromedriverFile" Source="$(var.AssetsDir)\chromedriver.exe" KeyPath="yes"/>
+      </Component>
+
+      <!-- Optional: drop icon next to exe -->
+      <Component Id="IconComponent" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="InstalledIcon" Source="$(var.AssetsDir)\icon.ico" KeyPath="yes"/>
+      </Component>
+
+      <!-- Start Menu shortcut -->
+      <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder" Guid="*">
+        <Shortcut Id="StartShortcut"
+                  Name="Autoscraper"
+                  Target="[INSTALLFOLDER]Autoscraper.exe"
+                  WorkingDirectory="INSTALLFOLDER"/>
+        <RegistryValue Root="HKCU" Key="Software\Autoscraper" Name="startmenu" Type="string" Value="1" KeyPath="yes"/>
+      </Component>
+
+      <!-- Desktop shortcut -->
+      <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
+        <Shortcut Id="DesktopShortcut"
+                  Name="Autoscraper"
+                  Target="[INSTALLFOLDER]Autoscraper.exe"
+                  WorkingDirectory="INSTALLFOLDER"/>
+        <RegistryValue Root="HKCU" Key="Software\Autoscraper" Name="desktop" Type="string" Value="1" KeyPath="yes"/>
+      </Component>
+    </Feature>
+  </Package>
+</Wix>
