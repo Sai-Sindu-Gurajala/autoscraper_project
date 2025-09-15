@@ -17,6 +17,7 @@ from autoscraper_core import core
 from autoscraper_core.pathing import resource_path
 
 EXPORT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output")
+EXPORT_DIR = os.path.join(os.path.expanduser("~"), "Documents", "Autoscraper_Output")
 NO_COL_KEY = "__row_no__"
 
 
@@ -634,9 +635,27 @@ class MainWindow(QtWidgets.QMainWindow):
     def on_scrape_finished(self, all_rows):
         self.scraped_data = list(all_rows or [])
         self._set_enabled(start=False, stop=True, auto_detect=True, learn_pagination=True,
-                          learn_card=True, open_first=True, start_fields=True, done_fields=True,
-                          scrape=True, export=bool(self.scraped_data))
+                        learn_card=True, open_first=True, start_fields=True, done_fields=True,
+                        scrape=True, export=bool(self.scraped_data))
         self.rail.setCurrentRow(6)
+
+        # --- NEW: Pop-up on completion ---
+        count = len(self.scraped_data)
+        if count > 0:
+            msg = QtWidgets.QMessageBox(self)
+            msg.setIcon(QtWidgets.QMessageBox.Information)
+            msg.setWindowTitle("Scraping Complete")
+            msg.setText(f"Scraping finished successfully.\n\nItems scraped: {count}\n\nExport the results to Excel?")
+            export_btn = msg.addButton("Export Now", QtWidgets.QMessageBox.AcceptRole)
+            msg.addButton("Close", QtWidgets.QMessageBox.RejectRole)
+            msg.exec_()
+            if msg.clickedButton() == export_btn:
+                self.export_data()
+        else:
+            QtWidgets.QMessageBox.information(
+                self, "Scraping Complete",
+                "Scraping finished, but no items were found.\n\nTry adjusting Auto Detect/Pagination or increase Max Pages."
+            )
 
     # ---------- header ctx menu ----------
     def _on_header_menu(self, pos: QtCore.QPoint):

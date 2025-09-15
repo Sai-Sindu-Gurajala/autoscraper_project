@@ -887,6 +887,10 @@ def scrape_with_locked_container(
     prev_card_keys: set = set()
     detail_selectors = detail_selectors or []
 
+    # NEW: light throttle for live row-level UI updates
+    last_emit = 0.0
+    EMIT_INTERVAL = 0.15  # seconds
+
     for page in range(max_pages):
         time.sleep(0.4)
 
@@ -944,6 +948,19 @@ def scrape_with_locked_container(
                         log_callback(f"Detail extraction failed: {ex}")
 
             page_data.append(d)
+            all_data.append(d)
+
+            # NEW: live per-row preview (throttled)
+            if update_callback:
+                now = time.time()
+                if now - last_emit >= EMIT_INTERVAL:
+                    update_callback(list(all_data), page + 1)
+                    last_emit = now
+                    try:
+                        from PyQt5 import QtWidgets
+                        QtWidgets.QApplication.processEvents()
+                    except Exception:
+                        pass
 
         if not page_data:
             if log_callback:
@@ -955,9 +972,9 @@ def scrape_with_locked_container(
                 log_callback("Pagination ended: same cards as previous page.")
             break
 
-        all_data.extend(page_data)
         prev_card_keys = card_keys
 
+        # still emit a page-level snapshot
         if update_callback:
             update_callback(list(all_data), page + 1)
             try:
